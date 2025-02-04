@@ -4,6 +4,7 @@ class WhatsAppController { // Criando a classe controller do WhatsApp
 
         this.elementsPrototype();
         this.loadElements(); // Metodo para carregador os elementos 
+        this.initEvents();
     }
 
 
@@ -52,29 +53,66 @@ class WhatsAppController { // Criando a classe controller do WhatsApp
                 this.style[name] = styles[name];
             }
             return this;
-        }
+        };
 
         Element.prototype.addClass = function(name){
             // O método 'addClass' adiciona uma classe CSS ao elemento.
            this.classList.add(name); // Adiciona a classe ao elemento.
            return this;
-        }
+        };
 
         Element.prototype.removeClass = function(name){
             // O método 'removeClass' remove uma classe CSS do elemento.
             this.classList.remove(name); // Remove a classe do elemento.
             return this;
-        }
+        };
 
         Element.prototype.toggleClass = function(name){
             // O método 'toggleClass' alterna a classe CSS no elemento.
             // Se a classe existir, ela será removida; se não existir, ela será adicionada.
             this.classList.toggle(name)
             return this;
-        }
+        };
 
         Element.prototype.hasClass = function(name){
             return this.classList.contains(name)
-        }
-    }
-}
+        };
+    };
+
+    initEvents(){ // metodo para inicializar meus eventos
+         this.el.myPhoto.on('click', e=>{ // detnro dos elementos busco o my-photo que foi convertido para CamelCase myPhoto e passo o on 
+            // que é do prototype para adicionar os eventos, quando clicar neste elemento
+            // vai fechar todos os paineis que estão dentro do metodo closeAllLeftPanel() 
+            this.closeAllLeftPanel();
+            // Aqui vai dar um show, para aparecer o elemento panelEditProfile(), show que esta vindo do prototype
+            this.el.panelEditProfile.show();
+            // aqui tem um delay para que o efeito do css apareça na tela
+            setTimeout(()=>{
+                // adiciono a classe open no elemento depois de 300 milisegundos
+                this.el.panelEditProfile.addClass('open');
+            }, 300)
+            
+         });
+
+         this.el.btnNewContact.on('click', e=>{
+            this.closeAllLeftPanel()
+            this.el.panelAddContact.show()
+            setTimeout(()=>{
+                this.el.panelAddContact.addClass('open');
+            }, 300)
+            
+         });
+         this.el.btnClosePanelEditProfile.on('click', e=>{
+            this.el.panelEditProfile.removeClass('open');
+         });
+         this.el.btnClosePanelAddContact.on('click', e=>{
+            this.el.panelAddContact.removeClass('open');
+         })
+    };
+
+    closeAllLeftPanel(){ // metodo para fechar os paineis do lado esquerdo da tela
+        this.el.panelAddContact.hide();
+        this.el.panelEditProfile.hide();
+    };
+};
+
