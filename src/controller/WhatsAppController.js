@@ -175,12 +175,78 @@ class WhatsAppController { // Criando a classe controller do WhatsApp
         })
 
          // Eventos para os botões de anexos (apenas exibem mensagens no console por enquanto)
-         this.el.btnAttachPhoto.on('click', e =>{console.log('Photo')});
-         this.el.btnAttachCamera.on('click', e =>{console.log('Camera')});
-         this.el.btnAttachDocument.on('click', e =>{console.log('Document')});
-         this.el.btnAttachContact.on('click', e =>{console.log('Contact')});
+         this.el.btnAttachPhoto.on('click', e =>{
+            this.el.inputPhoto.click(); // simula o click no botão
+         });
+         
+         // aqui ele percorre toda a coleção com o spread, buscando cada file
+         this.el.inputPhoto.on('change', e=>{
+            console.log(this.el.inputPhoto.files);
+
+            [...this.el.inputPhoto.files].forEach(file=>{
+                console.log(file)
+            })
+         })
+
+          // abre o botão da camera e remove outros elementos que estao no closeAllMainPanel
+         this.el.btnAttachCamera.on('click', e =>{
+            this.closeAllMainPanel();
+            this.el.panelCamera.addClass('open');
+            this.el.panelCamera.css({
+                height: 'calc(130% - 120px )'
+            })
+         });
+
+         // fecha a camera e da um show nas mensagens
+         this.el.btnClosePanelCamera.on('click', e=>{
+            this.el.panelCamera.removeClass('open');
+            this.el.panelMessagesContainer.show();
+         })
+
+         // tira a foto
+         this.el.btnTakePicture.on('click', e=>{
+            console.log('Foto')
+         })
+
+         // abre o elemento de escolher os documentos
+         this.el.btnAttachDocument.on('click', e =>{
+            this.closeAllMainPanel()
+            this.el.panelDocumentPreview.addClass('open')
+            this.el.panelDocumentPreview.css({
+                height: 'calc(130% - 120px )'
+            })
+         });
+
+         // fecha o elemento de escolher os documentos
+         this.el.btnClosePanelDocumentPreview.on('click', e=>{
+            this.el.panelDocumentPreview.removeClass('open');
+            this.el.panelMessagesContainer.show();
+
+         })
+
+         // envia o documento
+         this.el.btnSendDocument.on('click', e=>{
+            console.log(`Evento`)
+         })
+          
+        // mostra os contatos
+         this.el.btnAttachContact.on('click', e =>{
+            this.el.modalContacts.show()
+         });
+
+         // retira o modal dos contatos
+         this.el.btnCloseModalContacts.on('click', e=>{
+            this.el.modalContacts.hide()
+         })
 
     };
+
+    // fecha alguns elementos para não fica repetitivo 
+    closeAllMainPanel(){
+        this.el.panelMessagesContainer.hide();
+        this.el.panelDocumentPreview.removeClass('open');
+        this.el.panelCamera.removeClass('open');
+    }
 
         // Método para fechar o menu de anexos
     closeMenuAttach(event) {
