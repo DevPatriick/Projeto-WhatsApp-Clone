@@ -313,7 +313,33 @@ class WhatsAppController { // Criando a classe controller do WhatsApp
                 })
 
                 // adiciona o emoji no textp
-                this.el.inputText.appendChild(img);
+                // this.el.inputText.appendChild(img);
+
+                // serve para pegar a posição do cursos atual
+                let cursor = window.getSelection();
+
+                // se o campo que o user estiver digitando não for o inputText ele foca no inputText
+                if(!cursor.focusNode.id || !cursor.focusNode.id == 'inputText'){
+                    this.el.inputText.focus();
+                    cursor;
+                }
+
+                // cria um intervalo para manipular o texto
+                let range = document.createRange();
+
+                // busca a posição atual do cursor
+                range = cursor.getRangeAt(0);
+                // limpa o texto selecionado pelo user
+                range.deleteContents();
+                // cria um documento vazio para incluir depois no campo texto
+                let frag  = document.createDocumentFragment();
+                frag.appendChild(img);
+                // coloca a imagem do fragmento na posição exata
+                range.insertNode(frag);
+                // ajusta o cursor para depois da imagem incluida
+                range.setStartAfter(img)
+
+
 
                 // força com que o javascript execute o evento ao clicar ou soltar o botão
                 this.el.inputText.dispatchEvent(new Event('keyup'));
