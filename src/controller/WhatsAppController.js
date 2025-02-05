@@ -195,6 +195,9 @@ class WhatsAppController { // Criando a classe controller do WhatsApp
             this.el.panelCamera.css({
                 height: 'calc(130% - 120px )'
             })
+
+            // instanciando minha camera e passando o elemento onde o video vai ser executado
+            this._camera = new CameraController(this.el.videoCamera);
         });
 
         // fecha a camera e da um show nas mensagens
