@@ -256,7 +256,55 @@ class WhatsAppController { // Criando a classe controller do WhatsApp
             this.closeRecordMicrophone();
         })
 
+
+        // quando qualquer tecla for solta ele faz a validação se o inputText está true ou false
+        // se for true executa o primeiro if 
+        this.el.inputText.on('keyup', e=>{
+            if(this.el.inputText.innerHTML.length){
+                this.el.inputPlaceholder.hide();
+                this.el.btnSendMicrophone.hide();
+                this.el.btnSend.show()
+            } else {
+                this.el.inputPlaceholder.show();
+                this.el.btnSendMicrophone.show();
+                this.el.btnSend.hide();
+            }
+        })
+
+        // ao clicar no btnSend ele faz um console.log do valor digitado e zera o valor
+        this.el.btnSend.on('click', e=>{
+            console.log(this.el.inputText.innerHTML);
+            this.el.inputText.innerHTML = '';
+            
+        })
+
+        // ao precionar enter executa o if e da um console do valor digitado e limpa o campo de texto
+        this.el.inputText.on('keypress', e=>{
+            if(e.key === 'Enter'){
+                console.log(this.el.inputText.innerHTML);
+                e.preventDefault()
+                this.el.inputPlaceholder.click();
+                this.el.inputText.innerHTML = '';
+            }
+        })
+
+        // configurando o botão para abrir e fechear os emojis
+        this.el.btnEmojis.on('click', e=>{
+            this.el.panelEmojis.toggleClass('open')
+        })
+
+        // ao clicar no emoji ele aparece no console
+        // faz um forEach de cada emoji e configurando o evento para que ele busque o emoji clicado e
+        // exiba no console
+        this.el.panelEmojis.querySelectorAll('.emojik').forEach(emoji=>{
+            emoji.on('click', e=>{
+                console.log(emoji.dataset.unicode)
+            })
+        })
+
     };
+
+   
 
     // contato o tempo do audio
     startRecordMicrophoneTime(){
