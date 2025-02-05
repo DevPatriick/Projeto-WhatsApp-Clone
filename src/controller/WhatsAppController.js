@@ -299,8 +299,30 @@ class WhatsAppController { // Criando a classe controller do WhatsApp
         this.el.panelEmojis.querySelectorAll('.emojik').forEach(emoji=>{
             emoji.on('click', e=>{
                 console.log(emoji.dataset.unicode)
+                // img recebe o clone do emoji para adicionar ao texto
+                let img = this.el.imgEmojiDefault.cloneNode();
+
+                // neste trecho copio o estilo css, o dataset unicode que seria o emoji
+                img.style.cssText = emoji.style.cssText;
+                img.dataset.unicode = emoji.dataset.unicode;
+                img.alt = emoji.dataset.unicode;
+
+                // busca o nome da classe do emoji e adicionar na img o nome da classe do emoji
+                emoji.classList.forEach(name=>{
+                    img.classList.add(name);
+                })
+
+                // adiciona o emoji no textp
+                this.el.inputText.appendChild(img);
+
+                // força com que o javascript execute o evento ao clicar ou soltar o botão
+                this.el.inputText.dispatchEvent(new Event('keyup'));
+
+
             })
         })
+
+        
 
     };
 
