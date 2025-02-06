@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/DevPatriick/Projeto-WhatsApp-Clone#readme",
   "dependencies": {
-    "webpack": "^3.1.0",
+    "webpack": "^5.97.1",
     "webpack-dev-server": "^2.5.1"
   }
 }
