@@ -4,7 +4,9 @@
   "description": "Este é o acompanhamento do progresso no curso de **Projeto WhatsApp Clone**. \r O curso tem um total de **50 aulas**, e atualmente estou na **aula 13**.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack-dev-server"
   },
   "repository": {
     "type": "git",
