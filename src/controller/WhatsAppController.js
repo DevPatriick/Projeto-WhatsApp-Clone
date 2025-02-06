@@ -371,7 +371,7 @@ class WhatsAppController { // Criando a classe controller do WhatsApp
     closeRecordMicrophone() {
         this.el.recordMicrophone.hide();
         this.el.btnSendMicrophone.show();
-        clearInterval(this._recordMicrophoneInterval)
+        clearInterval(this._recordMicrophoneInterval);
     }
 
     // fecha alguns elementos para não fica repetitivo 

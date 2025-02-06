@@ -1,0 +1,23 @@
+{
+  "name": "project-whatsapp",
+  "version": "1.0.0",
+  "description": "Este é o acompanhamento do progresso no curso de **Projeto WhatsApp Clone**. \r O curso tem um total de **50 aulas**, e atualmente estou na **aula 13**.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DevPatriick/Projeto-WhatsApp-Clone.git"
+  },
+  "author": "Patrick Andrade",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DevPatriick/Projeto-WhatsApp-Clone/issues"
+  },
+  "homepage": "https://github.com/DevPatriick/Projeto-WhatsApp-Clone#readme",
+  "dependencies": {
+    "webpack": "^3.1.0",
+    "webpack-dev-server": "^2.5.1"
+  }
+}
