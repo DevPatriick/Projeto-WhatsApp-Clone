@@ -1,4 +1,7 @@
-class WhatsAppController { // Criando a classe controller do WhatsApp
+import  Format  from './../utils/Format';
+import  CameraController  from './CameraController.js';
+
+export default class WhatsAppController { // Criando a classe controller do WhatsApp
     constructor() {
         console.log('WhatsAppController Instanciado')
 
@@ -384,7 +387,7 @@ class WhatsAppController { // Criando a classe controller do WhatsApp
     // Método para fechar o menu de anexos
     closeMenuAttach(event) {
         document.removeEventListener('click', this.closeMenuAttach)
-        this.el.menuAttach.removeClass('open')
+        this.el.menuAttach.removeClass('open');
     }
 
     closeAllLeftPanel() { // metodo para fechar os paineis do lado esquerdo da tela

@@ -1,4 +1,4 @@
-class CameraController {
+export default class CameraController {
     // criando o construtor da classe que recebe o elemento do videoEl
     constructor(videoEl) {
         // crio um atributo privato 
@@ -11,11 +11,12 @@ class CameraController {
         navigator.mediaDevices.getUserMedia({
             video: true
         }).then(stream=>{
+            console.log(stream)
+            console.log(videoEl)
+            videoEl.srcObject = stream;
             // como stream é um objeto e o videoEl não consegue let um objeto e sim o link 
             // transformo o objeto numa URL
-            this._videoEl.scr = URL.createObjectURL(stream);
-            // força o video a tocar
-            this._videoEl.play();
+           
         }).catch(err=>{
             console.error(err)
         })

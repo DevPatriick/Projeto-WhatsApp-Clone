@@ -1,4 +1,4 @@
-class Format { // Arquivo util de formatação
+export default class Format { // Arquivo util de formatação
     static getCamelCase(text){ // criando um metodo estatico para ser chamado de fora da classe
 
         let div = document.createElement('div'); // Criando um HTML para servir como container 
