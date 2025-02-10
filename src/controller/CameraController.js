@@ -11,6 +11,8 @@ export default class CameraController {
         navigator.mediaDevices.getUserMedia({
             video: true
         }).then(stream=>{
+
+            this._stream = stream;
             console.log(stream)
             console.log(videoEl)
             videoEl.srcObject = stream;
@@ -19,6 +21,12 @@ export default class CameraController {
            
         }).catch(err=>{
             console.error(err)
+        })
+    }
+
+    stop(){
+        this._stream.getTracks().forEach(track=>{
+            track.stop()
         })
     }
 }

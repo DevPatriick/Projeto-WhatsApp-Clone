@@ -207,6 +207,7 @@ export default class WhatsAppController { // Criando a classe controller do What
         this.el.btnClosePanelCamera.on('click', e => {
             this.el.panelCamera.removeClass('open');
             this.el.panelMessagesContainer.show();
+            this._camera.stop();
         })
 
         // tira a foto
