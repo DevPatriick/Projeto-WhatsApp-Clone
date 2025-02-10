@@ -212,8 +212,44 @@ export default class WhatsAppController { // Criando a classe controller do What
 
         // tira a foto
         this.el.btnTakePicture.on('click', e => {
-            console.log('Foto')
+            // chamando o metodo quando eu clicar no botão de tirar a foto
+            // com isso ele me retorna a imagem
+            let dataUrl = this._camera.takePicture();
+
+            // passando a imagem que veio do takePicture para dentro do meu elemento
+            this.el.pictureCamera.src = dataUrl;
+            // agora eu mostro o meu elemento com a minha imagem
+            this.el.pictureCamera.show();
+            // ocultando o video
+            this.el.videoCamera.hide();
+            // aparecendo o botão para tirar a foto novamente 
+            this.el.btnReshootPanelCamera.show();
+            // ocultar o botão de tirar a foto
+            this.el.containerTakePicture.hide();
+            // mostrar o botão de enviar a foto
+            this.el.containerSendPicture.show();
+
         })
+
+        this.el.btnReshootPanelCamera.on('click', e=>{
+            // tira o elemento que mostra a imagem
+            this.el.pictureCamera.hide();
+            // mostra o video para tirar a foto
+            this.el.videoCamera.show();
+            // tira o botão de tentar outra foto
+            this.el.btnReshootPanelCamera.hide();
+            // mostra o botão de tirar foto
+            this.el.containerTakePicture.show();
+            // oculta o botão de enviar a foto
+            this.el.containerSendPicture.hide();
+
+        })
+
+        // evento para enviar a imagem
+        this.el.btnSendPicture.on('click', e=>{
+            console.log(this.el.pictureCamera.src)
+        })
+
 
         // abre o elemento de escolher os documentos
         this.el.btnAttachDocument.on('click', e => {
