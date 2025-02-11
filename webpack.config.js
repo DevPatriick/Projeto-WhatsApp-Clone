@@ -1,17 +1,14 @@
-const path = require('path')
+const path = require('path');
 
-// modulo do webpack
-module.exports =  {
-    // arquivo de entrada do codigo
+module.exports = {
     entry: {
         app: './src/app.js',
-        'pdf.worker': 'pdfjs-dist/build/pdf.worker.entry.js'
+        'pdf.worker': 'pdfjs-dist/build/pdf.worker.min.js',
     },
-    // quando fizer o build para qual arquivo ele vai o build
     output: {
         filename: '[name].bundle.js',
-        // vai para a pasta build
         path: path.join(__dirname, 'dist'),
-        publicPath: 'dist'
-    }
-}
+        publicPath: 'dist',
+    },
+    // Outras configurações do Webpack
+};

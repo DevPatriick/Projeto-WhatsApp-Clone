@@ -2,6 +2,7 @@ import Format from './../utils/Format';
 import CameraController from './CameraController.js';
 import MicrophoneController from './MicrophoneController.js';
 import { DocumentPreviewController } from './DocumentPreviewController.js';
+// import { Firebase } from '../utils/Firebase.js';
 
 export default class WhatsAppController { // Criando a classe controller do WhatsApp
     constructor() {
