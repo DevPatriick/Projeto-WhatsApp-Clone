@@ -11,5 +11,5 @@ O curso tem um total de **50 aulas**, e atualmente estou na **aula 19**.
 #### [█████░░░░░░░░░░░░░░] **38%**  
 - Aulas concluídas: **19 de 50**  
 
-### Bora codar 🚀💻!
+### Bora codar 🚀💻!!
 
