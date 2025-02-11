@@ -269,6 +269,11 @@ export default class WhatsAppController { // Criando a classe controller do What
             // se o input for true ele executa o codigo abaixo
             if (this.el.inputDocument.files.length) {
 
+                this.el.panelDocumentPreview.addClass('open')
+                this.el.panelDocumentPreview.css({
+                    height: '1%'
+                })
+
                 // file recebe os files que vem no pc do user
                 let file = this.el.inputDocument.files[0];
 
@@ -278,7 +283,7 @@ export default class WhatsAppController { // Criando a classe controller do What
 
                 // aqui é o retorno da minha promessa
                 this._documentPreviewController.getPreviewData().then(result => {
-                    console.log(data)
+                    // console.log(data)
                     // dentro do elemento que aparece o preview passo com o atributo src para aparecer a imagem
                     this.el.imgPanelDocumentPreview.src = result.src;
                     // incluo o nome do arquivo 
@@ -286,161 +291,171 @@ export default class WhatsAppController { // Criando a classe controller do What
                     this.el.imagePanelDocumentPreview.show();
                     this.el.filePanelDocumentPreview.hide();
 
+                    this.el.panelDocumentPreview.addClass('open')
+                    this.el.panelDocumentPreview.css({
+                        height: 'calc(130% - 120px )'
+                    })
+
 
                 }).catch(err => {
                     console.log(file.type);
+
+                    this.el.panelDocumentPreview.addClass('open')
+                    this.el.panelDocumentPreview.css({
+                        height: 'calc(130% - 120px )'
+                    })
                     // caso não nenhum dos arquivos cai neste outro switch que ve o tipo do arquivo
                     // aqui utilizei apenas um caso
                     // se for video/mp4 aparece a imagem de um documento, apenas para test
                     switch (file.type) {
-                    
+
                         case 'video/mp4':
                             this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-doc';
-                    break;
-                    
-                    // caso não tenha nenhum dos arquivos acima aparece uma imagem generica
-                    default:
-                        this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
-                        break
-                }
-                this.el.filenamePanelDocumentPreview.innerHTML = file.name
-                this.el.imagePanelDocumentPreview.hide();
-                this.el.filePanelDocumentPreview.show();
+                            break;
+
+                        // caso não tenha nenhum dos arquivos acima aparece uma imagem generica
+                        default:
+                            this.el.iconPanelDocumentPreview.className = 'jcxhw icon-doc-generic';
+                            break
+                    }
+                    this.el.filenamePanelDocumentPreview.innerHTML = file.name
+                    this.el.imagePanelDocumentPreview.hide();
+                    this.el.filePanelDocumentPreview.show();
 
                 })
-    }
-})
-
-// fecha o elemento de escolher os documentos
-this.el.btnClosePanelDocumentPreview.on('click', e => {
-    this.el.panelDocumentPreview.removeClass('open');
-    this.el.panelMessagesContainer.show();
-
-})
-
-// envia o documento
-this.el.btnSendDocument.on('click', e => {
-    console.log(`Evento`)
-})
-
-// mostra os contatos
-this.el.btnAttachContact.on('click', e => {
-    this.el.modalContacts.show()
-});
-
-// retira o modal dos contatos
-this.el.btnCloseModalContacts.on('click', e => {
-    this.el.modalContacts.hide()
-})
-
-// inicia a gravação do audio
-this.el.btnSendMicrophone.on('click', e => {
-    this.el.recordMicrophone.show();
-    this.el.btnSendMicrophone.hide();
-    this.startRecordMicrophoneTime();
-})
-
-// envia o audio
-this.el.btnFinishMicrophone.on('click', e => {
-    this.closeRecordMicrophone();
-})
-
-// cancela o audio
-this.el.btnCancelMicrophone.on('click', e => {
-    this.closeRecordMicrophone();
-})
-
-
-// quando qualquer tecla for solta ele faz a validação se o inputText está true ou false
-// se for true executa o primeiro if 
-this.el.inputText.on('keyup', e => {
-    if (this.el.inputText.innerHTML.length) {
-        this.el.inputPlaceholder.hide();
-        this.el.btnSendMicrophone.hide();
-        this.el.btnSend.show()
-    } else {
-        this.el.inputPlaceholder.show();
-        this.el.btnSendMicrophone.show();
-        this.el.btnSend.hide();
-    }
-})
-
-// ao clicar no btnSend ele faz um console.log do valor digitado e zera o valor
-this.el.btnSend.on('click', e => {
-    console.log(this.el.inputText.innerHTML);
-    this.el.inputText.innerHTML = '';
-
-})
-
-// ao precionar enter executa o if e da um console do valor digitado e limpa o campo de texto
-this.el.inputText.on('keypress', e => {
-    if (e.key === 'Enter') {
-        console.log(this.el.inputText.innerHTML);
-        e.preventDefault()
-        this.el.inputPlaceholder.click();
-        this.el.inputText.innerHTML = '';
-    }
-})
-
-// configurando o botão para abrir e fechear os emojis
-this.el.btnEmojis.on('click', e => {
-    this.el.panelEmojis.toggleClass('open')
-})
-
-// ao clicar no emoji ele aparece no console
-// faz um forEach de cada emoji e configurando o evento para que ele busque o emoji clicado e
-// exiba no console
-this.el.panelEmojis.querySelectorAll('.emojik').forEach(emoji => {
-    emoji.on('click', e => {
-        console.log(emoji.dataset.unicode)
-        // img recebe o clone do emoji para adicionar ao texto
-        let img = this.el.imgEmojiDefault.cloneNode();
-
-        // neste trecho copio o estilo css, o dataset unicode que seria o emoji
-        img.style.cssText = emoji.style.cssText;
-        img.dataset.unicode = emoji.dataset.unicode;
-        img.alt = emoji.dataset.unicode;
-
-        // busca o nome da classe do emoji e adicionar na img o nome da classe do emoji
-        emoji.classList.forEach(name => {
-            img.classList.add(name);
+            }
         })
 
-        // adiciona o emoji no textp
-        // this.el.inputText.appendChild(img);
+        // fecha o elemento de escolher os documentos
+        this.el.btnClosePanelDocumentPreview.on('click', e => {
+            this.el.panelDocumentPreview.removeClass('open');
+            this.el.panelMessagesContainer.show();
 
-        // serve para pegar a posição do cursos atual
-        let cursor = window.getSelection();
+        })
 
-        // se o campo que o user estiver digitando não for o inputText ele foca no inputText
-        if (!cursor.focusNode.id || !cursor.focusNode.id == 'inputText') {
-            this.el.inputText.focus();
-            cursor;
-        }
+        // envia o documento
+        this.el.btnSendDocument.on('click', e => {
+            console.log(`Evento`)
+        })
 
-        // cria um intervalo para manipular o texto
-        let range = document.createRange();
+        // mostra os contatos
+        this.el.btnAttachContact.on('click', e => {
+            this.el.modalContacts.show()
+        });
 
-        // busca a posição atual do cursor
-        range = cursor.getRangeAt(0);
-        // limpa o texto selecionado pelo user
-        range.deleteContents();
-        // cria um documento vazio para incluir depois no campo texto
-        let frag = document.createDocumentFragment();
-        frag.appendChild(img);
-        // coloca a imagem do fragmento na posição exata
-        range.insertNode(frag);
-        // ajusta o cursor para depois da imagem incluida
-        range.setStartAfter(img)
+        // retira o modal dos contatos
+        this.el.btnCloseModalContacts.on('click', e => {
+            this.el.modalContacts.hide()
+        })
+
+        // inicia a gravação do audio
+        this.el.btnSendMicrophone.on('click', e => {
+            this.el.recordMicrophone.show();
+            this.el.btnSendMicrophone.hide();
+            this.startRecordMicrophoneTime();
+        })
+
+        // envia o audio
+        this.el.btnFinishMicrophone.on('click', e => {
+            this.closeRecordMicrophone();
+        })
+
+        // cancela o audio
+        this.el.btnCancelMicrophone.on('click', e => {
+            this.closeRecordMicrophone();
+        })
+
+
+        // quando qualquer tecla for solta ele faz a validação se o inputText está true ou false
+        // se for true executa o primeiro if 
+        this.el.inputText.on('keyup', e => {
+            if (this.el.inputText.innerHTML.length) {
+                this.el.inputPlaceholder.hide();
+                this.el.btnSendMicrophone.hide();
+                this.el.btnSend.show()
+            } else {
+                this.el.inputPlaceholder.show();
+                this.el.btnSendMicrophone.show();
+                this.el.btnSend.hide();
+            }
+        })
+
+        // ao clicar no btnSend ele faz um console.log do valor digitado e zera o valor
+        this.el.btnSend.on('click', e => {
+            console.log(this.el.inputText.innerHTML);
+            this.el.inputText.innerHTML = '';
+
+        })
+
+        // ao precionar enter executa o if e da um console do valor digitado e limpa o campo de texto
+        this.el.inputText.on('keypress', e => {
+            if (e.key === 'Enter') {
+                console.log(this.el.inputText.innerHTML);
+                e.preventDefault()
+                this.el.inputPlaceholder.click();
+                this.el.inputText.innerHTML = '';
+            }
+        })
+
+        // configurando o botão para abrir e fechear os emojis
+        this.el.btnEmojis.on('click', e => {
+            this.el.panelEmojis.toggleClass('open')
+        })
+
+        // ao clicar no emoji ele aparece no console
+        // faz um forEach de cada emoji e configurando o evento para que ele busque o emoji clicado e
+        // exiba no console
+        this.el.panelEmojis.querySelectorAll('.emojik').forEach(emoji => {
+            emoji.on('click', e => {
+                console.log(emoji.dataset.unicode)
+                // img recebe o clone do emoji para adicionar ao texto
+                let img = this.el.imgEmojiDefault.cloneNode();
+
+                // neste trecho copio o estilo css, o dataset unicode que seria o emoji
+                img.style.cssText = emoji.style.cssText;
+                img.dataset.unicode = emoji.dataset.unicode;
+                img.alt = emoji.dataset.unicode;
+
+                // busca o nome da classe do emoji e adicionar na img o nome da classe do emoji
+                emoji.classList.forEach(name => {
+                    img.classList.add(name);
+                })
+
+                // adiciona o emoji no textp
+                // this.el.inputText.appendChild(img);
+
+                // serve para pegar a posição do cursos atual
+                let cursor = window.getSelection();
+
+                // se o campo que o user estiver digitando não for o inputText ele foca no inputText
+                if (!cursor.focusNode.id || !cursor.focusNode.id == 'inputText') {
+                    this.el.inputText.focus();
+                    cursor;
+                }
+
+                // cria um intervalo para manipular o texto
+                let range = document.createRange();
+
+                // busca a posição atual do cursor
+                range = cursor.getRangeAt(0);
+                // limpa o texto selecionado pelo user
+                range.deleteContents();
+                // cria um documento vazio para incluir depois no campo texto
+                let frag = document.createDocumentFragment();
+                frag.appendChild(img);
+                // coloca a imagem do fragmento na posição exata
+                range.insertNode(frag);
+                // ajusta o cursor para depois da imagem incluida
+                range.setStartAfter(img)
 
 
 
-        // força com que o javascript execute o evento ao clicar ou soltar o botão
-        this.el.inputText.dispatchEvent(new Event('keyup'));
+                // força com que o javascript execute o evento ao clicar ou soltar o botão
+                this.el.inputText.dispatchEvent(new Event('keyup'));
 
 
-    })
-})
+            })
+        })
 
 
 
@@ -451,40 +466,40 @@ this.el.panelEmojis.querySelectorAll('.emojik').forEach(emoji => {
 
 
 
-// contato o tempo do audio
-startRecordMicrophoneTime() {
+    // contato o tempo do audio
+    startRecordMicrophoneTime() {
 
-    let start = Date.now();
+        let start = Date.now();
 
-    this._recordMicrophoneInterval = setInterval(() => {
-        this.el.recordMicrophoneTimer.innerHTML = Format.toTime(Date.now() - start);
-    }, 1000)
+        this._recordMicrophoneInterval = setInterval(() => {
+            this.el.recordMicrophoneTimer.innerHTML = Format.toTime(Date.now() - start);
+        }, 1000)
 
-}
+    }
 
-closeRecordMicrophone() {
-    this.el.recordMicrophone.hide();
-    this.el.btnSendMicrophone.show();
-    clearInterval(this._recordMicrophoneInterval);
-}
+    closeRecordMicrophone() {
+        this.el.recordMicrophone.hide();
+        this.el.btnSendMicrophone.show();
+        clearInterval(this._recordMicrophoneInterval);
+    }
 
-// fecha alguns elementos para não fica repetitivo 
-closeAllMainPanel() {
-    this.el.panelMessagesContainer.hide();
-    this.el.panelDocumentPreview.removeClass('open');
-    this.el.panelCamera.removeClass('open');
-}
+    // fecha alguns elementos para não fica repetitivo 
+    closeAllMainPanel() {
+        this.el.panelMessagesContainer.hide();
+        this.el.panelDocumentPreview.removeClass('open');
+        this.el.panelCamera.removeClass('open');
+    }
 
-// Método para fechar o menu de anexos
-closeMenuAttach(event) {
-    document.removeEventListener('click', this.closeMenuAttach)
-    this.el.menuAttach.removeClass('open');
-}
+    // Método para fechar o menu de anexos
+    closeMenuAttach(event) {
+        document.removeEventListener('click', this.closeMenuAttach)
+        this.el.menuAttach.removeClass('open');
+    }
 
-closeAllLeftPanel() { // metodo para fechar os paineis do lado esquerdo da tela
-    this.el.panelAddContact.hide();
-    this.el.panelEditProfile.hide();
-};
+    closeAllLeftPanel() { // metodo para fechar os paineis do lado esquerdo da tela
+        this.el.panelAddContact.hide();
+        this.el.panelEditProfile.hide();
+    };
 
 
 };
