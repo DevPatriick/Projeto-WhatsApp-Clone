@@ -1,5 +1,9 @@
-export default class MicrophoneController{
+import { ClassEvent } from "../utils/ClassEvent";
+
+export default class MicrophoneController extends ClassEvent{
     constructor(){
+
+        super();
        // api navigator para media, acessar a media do user com o getUserMedia
         //  passo o objeto video dizendo qual o tipo de midia
         // ele me retorna uma promessa
@@ -12,7 +16,9 @@ export default class MicrophoneController{
             audio.srcObject = stream;
             // como stream é um objeto e o videoEl não consegue let um objeto e sim o link 
             // transformo o objeto numa URL
-            audio.play()
+            audio.play();
+
+            this.trigger('play', audio)
 
         }).catch(err => {
             console.error(err)

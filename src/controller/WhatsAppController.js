@@ -355,6 +355,10 @@ export default class WhatsAppController { // Criando a classe controller do What
             this.el.btnSendMicrophone.hide();
             this.startRecordMicrophoneTime();
             this._microphoneController = new MicrophoneController();
+
+            this._microphoneController.on('play', musica=>{
+                console.log(`Recebi o audio: ${musica}`)
+            })
         })
 
         // envia o audio
