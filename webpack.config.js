@@ -3,12 +3,15 @@ const path = require('path')
 // modulo do webpack
 module.exports =  {
     // arquivo de entrada do codigo
-    entry: './src/app.js',
+    entry: {
+        app: './src/app.js',
+        'pdf.worker': 'pdfjs-dist/build/pdf.worker.entry.js'
+    },
     // quando fizer o build para qual arquivo ele vai o build
     output: {
-        filename: 'bundle.js',
+        filename: '[name].bundle.js',
         // vai para a pasta build
-        path: path.resolve(__dirname, '/dist'),
+        path: path.join(__dirname, 'dist'),
         publicPath: 'dist'
     }
 }
