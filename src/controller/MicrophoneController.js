@@ -44,7 +44,7 @@ export default class MicrophoneController extends ClassEvent {
 
     // metodo para iniciar a gravação
     startRecorder() {
-        // valida se inicou com o metodo
+        // valida se iniciou com o metodo
         if (this.isAvailable()) {
             // meu atributo recebe o MediaRecorder para gravação, passo meu stream e o objeto do mimetype
            this._mediaRecoder = new MediaRecorder(this._stream, {
@@ -91,7 +91,8 @@ export default class MicrophoneController extends ClassEvent {
            })
 
            // chama a midia para gravar
-           this._mediaRecoder.start()
+           this._mediaRecoder.start();
+           this.startTimer();
         }
     }
 
@@ -100,6 +101,19 @@ export default class MicrophoneController extends ClassEvent {
         if (this.isAvailable()) {
            this._mediaRecoder.stop();
            this.stop();
+           this.stopTimer()
         }
+    }
+
+    startTimer(){
+        let start = Date.now();
+
+        this._recordMicrophoneInterval = setInterval(() => {
+           this.trigger('timer', (Date.now() - start))
+        }, 1000)
+    }
+
+    stopTimer(){
+        clearInterval(this._recordMicrophoneInterval);
     }
 }
