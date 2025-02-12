@@ -8,10 +8,22 @@ export default class WhatsAppController { // Criando a classe controller do What
     constructor() {
         console.log('WhatsAppController Instanciado')
 
+        // this.initAuth();
         this.elementsPrototype(); // Chama o método que adiciona novos métodos aos elementos HTML
         this.loadElements(); // Metodo para carregador os elementos 
         this.initEvents(); // Método que inicializa os eventos
+        // this._firebase = new Firebase()
     }
+
+    // initAuth() {
+    //     this._firebase.initAuth().
+    //         then(response => {
+    //             console.log('response', response)
+    //         })
+    //         .catch(err => {
+    //             console.error(err)
+    //         })
+    // }
 
 
     loadElements() { // Metodo para carregar os elementos
@@ -284,7 +296,7 @@ export default class WhatsAppController { // Criando a classe controller do What
                 this._documentPreviewController = new DocumentPreviewController(file);
 
                 // aqui é o retorno da minha promessa
-                this._documentPreviewController.getPreviewData().then(result => {
+                this._documentPreviewController.getPriviewData().then(result => {
                     // console.log(data)
                     // dentro do elemento que aparece o preview passo com o atributo src para aparecer a imagem
                     this.el.imgPanelDocumentPreview.src = result.src;
@@ -356,14 +368,14 @@ export default class WhatsAppController { // Criando a classe controller do What
             this.el.btnSendMicrophone.hide();
             this._microphoneController = new MicrophoneController();
 
-            
 
-            this._microphoneController.on('ready', musica=>{
+
+            this._microphoneController.on('ready', musica => {
                 console.log(musica)
                 this._microphoneController.startRecorder();
             })
 
-            this._microphoneController.on('timer', timer=>{
+            this._microphoneController.on('timer', timer => {
                 this.el.recordMicrophoneTimer.innerHTML = Format.toTime(timer);
             })
         })
@@ -376,7 +388,7 @@ export default class WhatsAppController { // Criando a classe controller do What
 
         // cancela o audio
         this.el.btnCancelMicrophone.on('click', e => {
-           
+
             this._microphoneController.stopRecorder();
             this.closeRecordMicrophone();
 
@@ -485,7 +497,7 @@ export default class WhatsAppController { // Criando a classe controller do What
     closeRecordMicrophone() {
         this.el.recordMicrophone.hide();
         this.el.btnSendMicrophone.show();
-        
+
     }
 
     // fecha alguns elementos para não fica repetitivo 
