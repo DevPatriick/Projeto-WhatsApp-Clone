@@ -208,7 +208,21 @@ export default class WhatsAppController { // Criando a classe controller do What
         this.el.formPanelAddContact.on('submit', e => { // quando o formulário for enviado submit
             e.preventDefault(); // tira o comportação padrão de carregar a página
             let formData = new FormData(this.el.formPanelAddContact); // o form data busca todos os dados do formulário para eu não precisar buscar cada campo do forms
+           let contact = new User(formData.get('email'))
 
+           contact.on('datachange', data=>{
+            if(data.name){
+                this._user.addContact(contact).then(()=>{
+                    this.el.btnClosePanelAddContact.click()
+                    console.info('Contato adicionado')
+                    
+                })
+            } else{
+                console.error('Usuário não encontrado')
+            }
+           })
+           
+            
         })
 
         // Evento para exibir a tela de conversa ao clicar em um contato
