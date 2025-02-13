@@ -24,24 +24,24 @@ export class Firebase {
             measurementId: "G-F2852X341H"
         };
 
-        if(!this._initialized){
+        if(!window._initializedFirebase){
             // Initialize Firebase
             firebase.initializeApp(firebaseConfig);
             // const analytics = getAnalytics(firebase);
             firebase.firestore().settings({
                 timestampsInSnapshots:true
             })
-            this._initialized = true;
+            window._initializedFirebase = true;
         }
 
     }
 
     static db(){
-        return app.firestore()
+        return firebase.firestore();
     }
 
     static hd(){
-        return app.storage()
+        return firebase.storage();
     }
 
     // solicitando a autenticação ao firebase
