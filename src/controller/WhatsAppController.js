@@ -2,28 +2,31 @@ import Format from './../utils/Format';
 import CameraController from './CameraController.js';
 import MicrophoneController from './MicrophoneController.js';
 import { DocumentPreviewController } from './DocumentPreviewController.js';
-// import { Firebase } from '../utils/Firebase.js';
+import { Firebase } from '../utils/Firebase.js';
 
 export default class WhatsAppController { // Criando a classe controller do WhatsApp
     constructor() {
         console.log('WhatsAppController Instanciado')
 
-        // this.initAuth();
+        this._firebase = new Firebase();
+        this.initAuth();
         this.elementsPrototype(); // Chama o método que adiciona novos métodos aos elementos HTML
         this.loadElements(); // Metodo para carregador os elementos 
         this.initEvents(); // Método que inicializa os eventos
-        // this._firebase = new Firebase()
+        
     }
 
-    // initAuth() {
-    //     this._firebase.initAuth().
-    //         then(response => {
-    //             console.log('response', response)
-    //         })
-    //         .catch(err => {
-    //             console.error(err)
-    //         })
-    // }
+    initAuth() {
+        this._firebase.initAuth().
+            then((response) => {
+                this.el.appContent.css({
+                    display: 'flex'
+                })
+            })
+            .catch(err => {
+                console.error(err)
+            })
+    }
 
 
     loadElements() { // Metodo para carregar os elementos
