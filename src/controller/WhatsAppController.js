@@ -5,6 +5,7 @@ import { DocumentPreviewController } from './DocumentPreviewController.js';
 import { Firebase } from '../utils/Firebase.js';
 import User from '../model/User.js';
 import { Chat } from '../model/Chat.js';
+import { Message } from '../model/Message.js';
 
 export default class WhatsAppController { // Criando a classe controller do WhatsApp
     constructor() {
@@ -132,23 +133,10 @@ export default class WhatsAppController { // Criando a classe controller do What
                     img.show(); // Exibe a imagem
                 }
 
-                div.on('click', e=>{
-                   
-                   this.el.activeName.innerHTML = contact.name;
-                   this.el.activeStatus.innerHTML = contact.status;
-
-                   if(contact.photo){
-                    let img = this.el.activePhoto;
-                    img.src = contact.photo;
-                    img.show();
-                   }
-
-                   this.el.home.hide()
-                   this.el.main.css({
-                    display: 'flex'
-                   })
-                   
-                })
+                div.addEventListener('click', () => {
+                    this.setActiveChat(contact);
+                });
+                
     
                 // Adiciona o contato à lista de mensagens
                 this.el.contactsMessagesList.appendChild(div);
@@ -159,6 +147,26 @@ export default class WhatsAppController { // Criando a classe controller do What
         this._user.getContacts();
     }
     
+    setActiveChat(contact){
+
+        console.log(contact);
+
+        this._contactActive = contact;
+        console.log(this._contactActive)
+        this.el.activeName.innerHTML = contact.name;
+        this.el.activeStatus.innerHTML = contact.status;
+
+        if(contact.photo){
+         let img = this.el.activePhoto;
+         img.src = contact.photo;
+         img.show();
+        }
+
+        this.el.home.hide()
+        this.el.main.css({
+         display: 'flex'
+        })
+    }
 
 
     loadElements() { // Metodo para carregar os elementos
@@ -576,15 +584,29 @@ export default class WhatsAppController { // Criando a classe controller do What
 
         // ao clicar no btnSend ele faz um console.log do valor digitado e zera o valor
         this.el.btnSend.on('click', e => {
-            console.log(this.el.inputText.innerHTML);
+
+            this._contactActive;
+            Message.send(
+                this._contactActive.chatId, 
+                this._user.email, 
+                'text',
+                 this.el.inputText.innerHTML)
             this.el.inputText.innerHTML = '';
+            this.el.panelEmojis.removeClass('open');
 
         })
 
         // ao precionar enter executa o if e da um console do valor digitado e limpa o campo de texto
         this.el.inputText.on('keypress', e => {
             if (e.key === 'Enter') {
-                console.log(this.el.inputText.innerHTML);
+                this._contactActive;
+                Message.send(
+                    this._contactActive.chatId, 
+                    this._user.email, 
+                    'text',
+                     this.el.inputText.innerHTML)
+                this.el.inputText.innerHTML = '';
+                this.el.panelEmojis.removeClass('open');
                 e.preventDefault()
                 this.el.inputPlaceholder.click();
                 this.el.inputText.innerHTML = '';

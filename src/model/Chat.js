@@ -47,7 +47,7 @@ export class Chat extends Model {
         return new Promise((resolve, reject) => {
             Chat.find(meEmail, contatcEmail).then(chats => {
                 if (chats.empty) {
-                    Chat.create(meEmail, contatcEmail).then(chat => {  // Aqui estava o erro
+                    Chat.create(meEmail, contatcEmail).then(chat => {  
                         resolve(chat);
                     }).catch(err => reject(err));
                 } else {
