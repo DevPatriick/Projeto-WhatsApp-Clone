@@ -188,7 +188,13 @@ export default class WhatsAppController { // Criando a classe controller do What
 
         // Evento para salvar a edição do perfil
         this.el.btnSavePanelEditProfile.on('click', e => {
-            console.log(`Digitou: ${this.el.inputNamePanelEditProfile.innerHTML}`)
+
+            this.el.btnSavePanelEditProfile.disabled = true;
+
+            this._user.name = this.el.inputNamePanelEditProfile.innerHTML;
+            this._user.save().then(()=>{
+                this.el.btnSavePanelEditProfile.disabled = false;
+            })
         })
 
         // Evento para capturar a tecla "Enter" ao editar o nome no perfil
