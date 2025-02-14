@@ -6,6 +6,7 @@ import { Firebase } from '../utils/Firebase.js';
 import User from '../model/User.js';
 import { Chat } from '../model/Chat.js';
 import { Message } from '../model/Message.js';
+import { FormatBase64 } from '../utils/Base64.js';
 const Swal = require('sweetalert2')
 
 export default class WhatsAppController { // Criando a classe controller do WhatsApp
@@ -202,22 +203,22 @@ export default class WhatsAppController { // Criando a classe controller do What
 
                         let me = (data.from === this._user.email);
 
-                        if(!me){
+                        if (!me) {
                             doc.ref.set({
                                 status: 'read'
-                            }, {merge: true})
+                            }, { merge: true })
                         }
                         let view = message.getViewElement(me);
 
                         this.el.panelMessagesContainer.appendChild(view);
                     } else {
                         let msgEl = this.el.panelMessagesContainer.querySelector(`#_${data.id}`);
-                    if (msgEl) {
-                        let statusEl = msgEl.querySelector('.message-status');
-                        if (statusEl) {
-                            statusEl.innerHTML = message.getStatusViewElement().outerHTML;
+                        if (msgEl) {
+                            let statusEl = msgEl.querySelector('.message-status');
+                            if (statusEl) {
+                                statusEl.innerHTML = message.getStatusViewElement().outerHTML;
+                            }
                         }
-                    }
                     }
                 });
 
@@ -537,28 +538,28 @@ export default class WhatsAppController { // Criando a classe controller do What
                 canvas.height = picture.height;
 
                 context.translate(picture.width, 0);
-                context.scale(-1,1)
-                context.drawImage(picture, 0,0,canvas.width,canvas.height )
+                context.scale(-1, 1)
+                context.drawImage(picture, 0, 0, canvas.width, canvas.height)
 
                 fetch(canvas.toDataURL(mimeType))
-                .then(res =>{ return res.arrayBuffer() })
-                .then(buffer =>{ return new File([buffer], filename, { type: mimeType})})
-                .then(file=>{
-                    Message.sendImage(this._contactActive.chatId, this._user.email, file)
-                    this.el.btnSendPicture.disabled = true;
-                    this.closeAllMainPanel();
-                    this._camera.stop();
-                    this.el.brnReshootPanelCamera.hide();
-                    this.el.pictureCamera.hide();
-                    this.el.videoCamera.show();
-                    this.el.containerSendPicture.hide();
-                    this.el.containerTakePicture.show();
-                    this.el.panelMessagesContainer.show();
-    
-                })
+                    .then(res => { return res.arrayBuffer() })
+                    .then(buffer => { return new File([buffer], filename, { type: mimeType }) })
+                    .then(file => {
+                        Message.sendImage(this._contactActive.chatId, this._user.email, file)
+                        this.el.btnSendPicture.disabled = true;
+                        this.closeAllMainPanel();
+                        this._camera.stop();
+                        this.el.brnReshootPanelCamera.hide();
+                        this.el.pictureCamera.hide();
+                        this.el.videoCamera.show();
+                        this.el.containerSendPicture.hide();
+                        this.el.containerTakePicture.show();
+                        this.el.panelMessagesContainer.show();
+
+                    })
             }
 
-           
+
 
             console.log(result)
         })
@@ -647,8 +648,28 @@ export default class WhatsAppController { // Criando a classe controller do What
 
         // envia o documento
         this.el.btnSendDocument.on('click', e => {
-            console.log(`Evento`)
-        })
+            let file = this.el.inputDocument.files[0];
+            let base64 = this.el.imgPanelDocumentPreview.src;
+
+            if (file.type === 'application/pdf') {
+
+                FormatBase64.toFile(base64).then(filePreview => {
+                Message.sendDocument(this._contactActive.chatId,
+                    this._user.email,
+                    file,
+                    filePreview,
+                    this.el.infoPanelDocumentPreview
+                )})
+            } else {
+                Message.sendDocument(this._contactActive.chatId,
+                    this._user.email,
+                    file,
+                )
+            }
+
+            this.el.btnClosePanelDocumentPreview.click()
+
+        });
 
         // mostra os contatos
         this.el.btnAttachContact.on('click', e => {

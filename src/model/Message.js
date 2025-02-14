@@ -1,6 +1,7 @@
 import { Firebase } from "../utils/Firebase";
 import { Model } from "./Model";
 import Format from './../utils/Format';
+// import { FormatBase64 } from "../utils/Base64";
 
 export class Message extends Model {
     constructor() {
@@ -21,6 +22,21 @@ export class Message extends Model {
 
     get status() { return this._data.status }
     set status(value) { this._data.status = value }
+
+    get preview() { return this._data.preview }
+    set preview(value) { this._data.preview = value }
+
+    get fileType() { return this._data.fileType }
+    set fileType(value) { this._data.fileType = value }
+
+    get fileName() { return this._data.fileName }
+    set fileName(value) { this._data.fileName = value }
+
+    get size() { return this._data.size }
+    set size(value) { this._data.size = value }
+
+    get from() { return this._data.from }
+    set from(value) { this._data.from = value }
 
     getViewElement(me = true) {
 
@@ -131,15 +147,15 @@ export class Message extends Model {
                                             </div>
                                         `
 
-                                        div.querySelector('.message-photo').on('load', e=>{
-                                            console.log('load ok')
-                                            div.querySelector('.message-photo').show();
-                                            querySelector('._340lu').hide();
-                                            querySelector('._3v3PK').css({
-                                                hiight: 'auto'
-                                            });
-                                            
-                                        })
+                div.querySelector('.message-photo').on('load', e => {
+                    console.log('load ok')
+                    div.querySelector('.message-photo').show();
+                    querySelector('._340lu').hide();
+                    querySelector('._3v3PK').css({
+                        hiight: 'auto'
+                    });
+
+                })
                 break;
 
             case 'document':
@@ -148,13 +164,13 @@ export class Message extends Model {
                                             <div class="_3_7SH _1ZPgd ">
                                                 <div class="_1fnMt _2CORf">
                                                     <a class="_1vKRe" href="#">
-                                                        <div class="_2jTyA" style="background-image: url()"></div>
+                                                        <div class="_2jTyA" style="background-image: url(${this.preview})"></div>
                                                         <div class="_12xX7">
                                                             <div class="_3eW69">
                                                                 <div class="JdzFp message-file-icon icon-doc-pdf"></div>
                                                             </div>
                                                             <div class="nxILt">
-                                                                <span dir="auto" class="message-filename">Arquivo.pdf</span>
+                                                                <span dir="auto" class="message-filename">${this.fileName}</span>
                                                             </div>
                                                             <div class="_17viz">
                                                                 <span data-icon="audio-download" class="message-file-download">
@@ -174,9 +190,9 @@ export class Message extends Model {
                                                         </div>
                                                     </a>
                                                     <div class="_3cMIj">
-                                                        <span class="PyPig message-file-info">32 páginas</span>
-                                                        <span class="PyPig message-file-type">PDF</span>
-                                                        <span class="PyPig message-file-size">4 MB</span>
+                                                        <span class="PyPig message-file-info">${this.info}</span>
+                                                        <span class="PyPig message-file-type">${this.fileType}</span>
+                                                        <span class="PyPig message-file-size">${this.size}</span>
                                                     </div>
                                                     <div class="_3Lj_s">
                                                         <div class="_1DZAH" role="button">
@@ -194,6 +210,9 @@ export class Message extends Model {
                                                 </div>
                                             </div>
                                         `
+                                        div.on('click', e=>{
+                                            window.open(this.content)
+                                        })
                 break;
 
             case 'audio':
@@ -328,25 +347,75 @@ export class Message extends Model {
         return div;
     }
 
-    static sendImage(chatId, from, file){
+    static sendDocument(chatId, from, file, filePreview) {
+        // Verifique se 'from' está definido
+        if (!from) {
+            console.error('A variável "from" não está definida!');
+            return;
+        }
+    
+        Message.send(chatId, from, 'document', '').then(msgRef => {
+            
+            // Aguarda as duas promessas de upload
+            Promise.all([
+                Message.upload(file, from), 
+                Message.upload(filePreview, from)
+            ]).then(([snapshot, snapshot2]) => {
+                // Agora podemos acessar as URLs de download
+                let downloadFile = snapshot.downloadURL;
+                let downloadPreview = snapshot2.downloadURL;
+    
+                // Envia os dados para o Firestore
+                msgRef.set({
+                    content: downloadFile,
+                    preview: downloadPreview,
+                    fileName: file.name,
+                    size: file.size,
+                    fileType: file.type,
+                    status: 'sent'
+                }, { merge: true });
+    
+            }).catch(error => {
+                console.error("Erro no upload dos arquivos:", error);
+            });
+            
+        }).catch(error => {
+            console.error("Erro ao enviar a mensagem:", error);
+        });
+    }
+    
+    
 
-        return new Promise((resolve, reject)=>{
+    static upload(file, from) {
+
+        return new Promise((resolve, reject) => {
+
             let uploadTask = Firebase.hd().ref(from).child(Date.now + '_' + file.name).put(file);
-            uploadTask.on('state_changed', e=>{
+            uploadTask.on('state_changed', e => {
                 console.info(e)
-            }, err=>{
-                console.error(err)
-            }, ()=>{
-                Message.send(chatId, 
-                    from, 
-                    'image',
-                     uploadTask.snapshot.downloadURL
-                    ).then(()=>{
-                    resolve()
-                })
+            }, err => {
+                reject()
+            }, () => {
+
+                resolve(uploadTask.snapshot)
             })
         })
-       
+    }
+
+
+
+    static sendImage(chatId, from, file) {
+
+        return new Promise((resolve, reject) => {
+
+            Message.upload(file, from).then(snapshot => {
+                chatId,
+                from,
+                'image',
+                snapshot.downloadURL
+            })
+        })
+
     }
 
     static async send(chatId, from, type, content) {
@@ -358,15 +427,21 @@ export class Message extends Model {
                 status: 'wait',
                 type,
                 from
+            }).then(result=>{
+
+                let docRef = result.parent.doc(result.id)
+                docRef.set({
+                    status: 'sent'
+                }, {
+                    merge: true
+                }).then(() => {
+                    resolve(docRef);
+                });
             });
         });
-        result_1.parent.doc(result_1.id).set({
-            status: 'sent'
-        }, {
-            merge: true
-        }).then(() => {
-            resolve();
-        });
+
+
+        return result_1;
 
 
     }
