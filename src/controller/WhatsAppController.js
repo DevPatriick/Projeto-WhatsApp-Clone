@@ -14,14 +14,62 @@ import { Upload } from '../utils/Upload.js';
 export default class WhatsAppController { // Criando a classe controller do WhatsApp
     constructor() {
         console.log('WhatsAppController Instanciado')
-
+    
         this._firebase = new Firebase();
         this.initAuth();
         this.elementsPrototype(); // Chama o método que adiciona novos métodos aos elementos HTML
-        this.loadElements(); // Metodo para carregador os elementos 
+        this.loadElements(); // Metodo para carregar os elementos 
         this.initEvents(); // Método que inicializa os eventos
-
+        this.checkNotifications()
     }
+    
+    checkNotifications() {
+        if (typeof Notification === 'function') {
+          
+            if (Notification.permission !== 'granted') {
+                this.el.alertNotificationPermission.show()
+            }
+            else {
+                this.el.alertNotificationPermission.hide()
+            }
+    
+           
+            this.el.alertNotificationPermission.on('click', e => {
+                Notification.requestPermission(permission => {
+                    if (permission === 'granted') {
+                        this.el.alertNotificationPermission.hide()
+                        console.info('Permissão de Notificação Concedida')
+                    } else {
+                        console.warn('Permissão de Notificação Negada')
+                    }
+                }).catch(error => {
+                    console.error('Erro ao solicitar permissão para notificação:', error);
+                });
+            })
+        } else {
+            console.warn('Notificações não são suportadas neste navegador');
+        }
+    }
+    
+    notification(data) {
+        if (Notification.permission === 'granted') {
+            const notificationOptions = {
+                icon: this._contactActive.photo, 
+                body: data.content
+            };
+            
+           
+            let n = new Notification(this._contactActive.name, notificationOptions);
+    
+            
+            setTimeout(() => {
+                if (n) n.close()
+            }, 3000);
+        } else {
+            console.warn('Permissão de notificação não concedida');
+        }
+    }
+    
 
     initAuth() {
         this._firebase.initAuth().
@@ -156,61 +204,72 @@ export default class WhatsAppController { // Criando a classe controller do What
         if (this._contactActive && this._activeChatListener) {
             this._activeChatListener(); // Remove o snapshot anterior
         }
-    
+
         console.log(contact);
-    
+
         // Atualiza o contato ativo
         this._contactActive = contact;
-    
+
         console.log(this._contactActive);
-    
+
         // Atualiza as informações na interface
         this.el.activeName.innerHTML = contact.name;
         this.el.activeStatus.innerHTML = contact.status;
-    
+
         if (contact.photo) {
             let img = this.el.activePhoto;
             img.src = contact.photo;
             img.style.display = 'block';  // Certifique-se de que a imagem esteja visível
         }
-    
+
         // Mostra a tela de chat e esconde a home
         this.el.home.style.display = 'none';
         this.el.main.style.display = 'flex';
-    
+
         // Limpa o histórico de mensagens antes de carregar as novas
         this.el.panelMessagesContainer.innerHTML = '';
-    
+
         // Criar um set para armazenar os IDs das mensagens já carregadas e evitar duplicação
         let messageIds = new Set();
-    
+
+        this._messagesReceived = []
         // Adiciona um novo listener para carregar mensagens do chat ativo
         this._activeChatListener = Message.getRef(this._contactActive.chatId)
             .orderBy('timeStamp')
             .onSnapshot(docs => {
-    
+
                 let scrollTop = this.el.panelMessagesContainer.scrollTop;
                 let scrollTopMax = this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight;
                 let autoScroll = (scrollTop >= scrollTopMax - 5); // Ajuste mais suave para rolagem
-    
+
+                
                 docs.forEach(doc => {
                     let data = doc.data();
                     data.id = doc.id;
                     let message = new Message();
                     message.fromJSON(data);
-                    
                     let me = (data.from === this._user.email);
+
+                    if (!me && this._messagesReceived.filter(id => {
+                        return id === data.id
+                    }).length === 0) {
+                        this.notification(data)
+                        this._messagesReceived.push(data.id)
+                    }
+                    
+
+                    
                     let view = message.getViewElement(me);
-    
+
                     // Verifica se a mensagem já foi carregada antes de adicioná-la
                     if (!messageIds.has(data.id)) {
                         messageIds.add(data.id); // Adiciona o ID ao set para evitar duplicação
-    
+
                         // Marca como lida caso não seja a própria mensagem
                         if (!me) {
                             doc.ref.set({ status: 'read' }, { merge: true });
                         }
-    
+
                         // Adiciona a mensagem ao container de mensagens
                         this.el.panelMessagesContainer.appendChild(view);
                     } else {
@@ -223,7 +282,7 @@ export default class WhatsAppController { // Criando a classe controller do What
                             }
                         }
                     }
-    
+
                     if (message.type === 'contact') {
                         view.querySelector('.btn-message-send').addEventListener('click', () => {
                             Chat.createIfNotExists(this._user.email, message.content.email).then(chat => {
@@ -233,21 +292,21 @@ export default class WhatsAppController { // Criando a classe controller do What
                                     this._user.addContact(contact);
                                     this._user.chatId = chat.id;
                                     contact.addContact(this._user);
-    
+
                                     this.setActiveChat(contact);
                                 });
                             });
                         });
                     }
                 });
-    
+
                 // Rolagem automática para a última mensagem
                 if (autoScroll) {
                     this.el.panelMessagesContainer.scrollTop = this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight;
                 }
             });
     }
-    
+
 
 
 
@@ -389,13 +448,13 @@ export default class WhatsAppController { // Criando a classe controller do What
             this.el.inputProfilePhoto.click() // incluindo o clique para abrir a seleção de arquivos
         })
 
-        this.el.inputProfilePhoto.on('change', e=>{
-            if(  this.el.inputProfilePhoto.files.length > 0 ){
+        this.el.inputProfilePhoto.on('change', e => {
+            if (this.el.inputProfilePhoto.files.length > 0) {
 
                 let file = this.el.inputProfilePhoto[0]
-                Upload.send(file, this._user.email).then(snapshot =>{
+                Upload.send(file, this._user.email).then(snapshot => {
                     this._user.photo = snapshot.downloadURL;
-                    history._user.save().then(()=>{
+                    history._user.save().then(() => {
                         this.el.btnClosePanelEditProfile.click()
                     })
                 })
@@ -746,7 +805,7 @@ export default class WhatsAppController { // Criando a classe controller do What
 
         // envia o audio
         this.el.btnFinishMicrophone.on('click', e => {
-            this._microphoneController.on('recorded', (file, metadata)=>{
+            this._microphoneController.on('recorded', (file, metadata) => {
                 Message.sendAudio(
                     this._contactActive.chatId,
                     this._user.email,
