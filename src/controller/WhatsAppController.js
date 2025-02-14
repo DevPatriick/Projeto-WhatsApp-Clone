@@ -148,51 +148,75 @@ export default class WhatsAppController { // Criando a classe controller do What
         this._user.getContacts();
     }
     
-    setActiveChat(contact){
+    setActiveChat(contact) {
 
-        if(this._contactActive){
-            Message.getRef(this._contactActive.chatId).onSnapshot(()=>{})
+        // Se houver um chat ativo, remover o listener antigo antes de ativar um novo
+        if (this._contactActive && this._activeChatListener) {
+            this._activeChatListener(); // Remove o snapshot anterior
         }
-
+    
         console.log(contact);
-
+    
+        // Atualiza o contato ativo
         this._contactActive = contact;
-        console.log(this._contactActive)
+    
+        console.log(this._contactActive);
+    
+        // Atualiza as informações na interface
         this.el.activeName.innerHTML = contact.name;
         this.el.activeStatus.innerHTML = contact.status;
-
-        if(contact.photo){
-         let img = this.el.activePhoto;
-         img.src = contact.photo;
-         img.show();
+    
+        if (contact.photo) {
+            let img = this.el.activePhoto;
+            img.src = contact.photo;
+            img.show();
         }
-
-        this.el.home.hide()
-        this.el.main.css({
-         display: 'flex'
-        })
-
-        Message.getRef(this._contactActive.chatId).orderBy('timeStamp').onSnapshot(docs=>{
-            this.el.panelMessagesContainer.innerHTML = '';
-            docs.forEach(doc=>{
-                let data = doc.data();
-                data.id = doc.id;
-
-                if(!this.el.panelMessagesContainer.querySelector(`#${data.id}`)){
-                    let message = new Message()
-
-                    message.fromJSON(data);
     
-                    let me = (data.from === this._user.email)
+        // Mostra a tela de chat e esconde a home
+        this.el.home.hide();
+        this.el.main.css({ display: 'flex' });
     
-                    let view = message.getViewElement(me);
+        // Limpa o histórico de mensagens antes de carregar as novas
+        this.el.panelMessagesContainer.innerHTML = '';
     
-                    this.el.panelMessagesContainer.appendChild(view)
+        // Criar um set para armazenar os IDs das mensagens já carregadas e evitar duplicação
+        let messageIds = new Set();
+    
+        // Adiciona um novo listener para carregar mensagens do chat ativo
+        this._activeChatListener = Message.getRef(this._contactActive.chatId)
+            .orderBy('timeStamp')
+            .onSnapshot(docs => {
+    
+                let scrollTop = this.el.panelMessagesContainer.scrollTop;
+                let scrollTopMax = this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight;
+                let autoScroll = (scrollTop >= scrollTopMax - 10); // Ajuste para rolagem precisa
+    
+                docs.forEach(doc => {
+                    let data = doc.data();
+                    data.id = doc.id;
+    
+                    // Verifica se a mensagem já foi carregada antes de adicioná-la
+                    if (!messageIds.has(data.id)) {
+                        messageIds.add(data.id); // Adiciona o ID ao set para evitar duplicação
+    
+                        let message = new Message();
+                        message.fromJSON(data);
+    
+                        let me = (data.from === this._user.email);
+                        let view = message.getViewElement(me);
+    
+                        this.el.panelMessagesContainer.appendChild(view);
+                    }
+                });
+    
+                // Rolagem automática para a última mensagem
+                if (autoScroll) {
+                    this.el.panelMessagesContainer.scrollTop = this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight;
                 }
-                
-            })
-        })
+            });
     }
+    
+    
 
 
     loadElements() { // Metodo para carregar os elementos
