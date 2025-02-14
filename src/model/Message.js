@@ -100,7 +100,7 @@ export class Message extends Model {
                                                                     </div>
                                                                 </div>
                                                             </div>
-                                                            <img src="#" class="_1JVSX message-photo" style="width: 100%; display:none">
+                                                            <img src="${this.content}" class="_1JVSX message-photo" style="width: 100%; display:none">
                                                             <div class="_1i3Za"></div>
                                                         </div>
                                                         <div class="message-container-legend">
@@ -130,6 +130,16 @@ export class Message extends Model {
                                                 </div>
                                             </div>
                                         `
+
+                                        div.querySelector('.message-photo').on('load', e=>{
+                                            console.log('load ok')
+                                            div.querySelector('.message-photo').show();
+                                            querySelector('._340lu').hide();
+                                            querySelector('._3v3PK').css({
+                                                hiight: 'auto'
+                                            });
+                                            
+                                        })
                 break;
 
             case 'document':
@@ -318,24 +328,44 @@ export class Message extends Model {
         return div;
     }
 
-    static send(chatId, from, type, content) {
+    static sendImage(chatId, from, file){
+
+        return new Promise((resolve, reject)=>{
+            let uploadTask = Firebase.hd().ref(from).child(Date.now + '_' + file.name).put(file);
+            uploadTask.on('state_changed', e=>{
+                console.info(e)
+            }, err=>{
+                console.error(err)
+            }, ()=>{
+                Message.send(chatId, 
+                    from, 
+                    'image',
+                     uploadTask.snapshot.downloadURL
+                    ).then(()=>{
+                    resolve()
+                })
+            })
+        })
+       
+    }
+
+    static async send(chatId, from, type, content) {
         console.log("Enviando mensagem para o chat:", chatId);
-        return new Promise((resolve, reject) => {
+        const result_1 = await new Promise((resolve, reject) => {
             Message.getRef(chatId).add({
                 content,
                 timeStamp: new Date(),
                 status: 'wait',
                 type,
                 from
-            })
-        }).then(result => {
-            result.parent.doc(result.id).set({
-                status: 'sent'
-            }, {
-                merge: true
-            }).then(()=>{
-                resolve();
-            })
+            });
+        });
+        result_1.parent.doc(result_1.id).set({
+            status: 'sent'
+        }, {
+            merge: true
+        }).then(() => {
+            resolve();
         });
 
 

@@ -452,10 +452,9 @@ export default class WhatsAppController { // Criando a classe controller do What
 
         // aqui ele percorre toda a coleção com o spread, buscando cada file
         this.el.inputPhoto.on('change', e => {
-            console.log(this.el.inputPhoto.files);
 
             [...this.el.inputPhoto.files].forEach(file => {
-                console.log(file)
+                Message.sendImage(this._contactActive.chatId, this._user.email, file)
             })
         })
 
