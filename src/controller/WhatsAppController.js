@@ -151,68 +151,69 @@ export default class WhatsAppController { // Criando a classe controller do What
     }
 
     setActiveChat(contact) {
-
         // Se houver um chat ativo, remover o listener antigo antes de ativar um novo
         if (this._contactActive && this._activeChatListener) {
             this._activeChatListener(); // Remove o snapshot anterior
         }
-
+    
         console.log(contact);
-
+    
         // Atualiza o contato ativo
         this._contactActive = contact;
-
+    
         console.log(this._contactActive);
-
+    
         // Atualiza as informações na interface
         this.el.activeName.innerHTML = contact.name;
         this.el.activeStatus.innerHTML = contact.status;
-
+    
         if (contact.photo) {
             let img = this.el.activePhoto;
             img.src = contact.photo;
-            img.show();
+            img.style.display = 'block';  // Certifique-se de que a imagem esteja visível
         }
-
+    
         // Mostra a tela de chat e esconde a home
-        this.el.home.hide();
-        this.el.main.css({ display: 'flex' });
-
+        this.el.home.style.display = 'none';
+        this.el.main.style.display = 'flex';
+    
         // Limpa o histórico de mensagens antes de carregar as novas
         this.el.panelMessagesContainer.innerHTML = '';
-
+    
         // Criar um set para armazenar os IDs das mensagens já carregadas e evitar duplicação
         let messageIds = new Set();
-
+    
         // Adiciona um novo listener para carregar mensagens do chat ativo
         this._activeChatListener = Message.getRef(this._contactActive.chatId)
             .orderBy('timeStamp')
             .onSnapshot(docs => {
-
+    
                 let scrollTop = this.el.panelMessagesContainer.scrollTop;
                 let scrollTopMax = this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight;
-                let autoScroll = (scrollTop >= scrollTopMax - 10); // Ajuste para rolagem precisa
-
+                let autoScroll = (scrollTop >= scrollTopMax - 5); // Ajuste mais suave para rolagem
+    
                 docs.forEach(doc => {
                     let data = doc.data();
                     data.id = doc.id;
                     let message = new Message();
                     message.fromJSON(data);
+                    
+                    let me = (data.from === this._user.email);
+                    let view = message.getViewElement(me);
+    
                     // Verifica se a mensagem já foi carregada antes de adicioná-la
                     if (!messageIds.has(data.id)) {
                         messageIds.add(data.id); // Adiciona o ID ao set para evitar duplicação
-
-                        let me = (data.from === this._user.email);
-
+    
+                        // Marca como lida caso não seja a própria mensagem
                         if (!me) {
-                            doc.ref.set({
-                                status: 'read'
-                            }, { merge: true })
+                            doc.ref.set({ status: 'read' }, { merge: true });
                         }
-                        let view = message.getViewElement(me);
-
+    
+                        // Adiciona a mensagem ao container de mensagens
                         this.el.panelMessagesContainer.appendChild(view);
                     } else {
+                        // Se a mensagem já foi carregada, apenas atualize seu status
                         let msgEl = this.el.panelMessagesContainer.querySelector(`#_${data.id}`);
                         if (msgEl) {
                             let statusEl = msgEl.querySelector('.message-status');
@@ -221,15 +222,31 @@ export default class WhatsAppController { // Criando a classe controller do What
                             }
                         }
                     }
+    
+                    if (message.type === 'contact') {
+                        view.querySelector('.btn-message-send').addEventListener('click', () => {
+                            Chat.createIfNotExists(this._user.email, message.content.email).then(chat => {
+                                let contact = new User(message.content.email);
+                                contact.on('datachange', data => {
+                                    contact.chatId = chat.id;
+                                    this._user.addContact(contact);
+                                    this._user.chatId = chat.id;
+                                    contact.addContact(this._user);
+    
+                                    this.setActiveChat(contact);
+                                });
+                            });
+                        });
+                    }
                 });
-
+    
                 // Rolagem automática para a última mensagem
                 if (autoScroll) {
                     this.el.panelMessagesContainer.scrollTop = this.el.panelMessagesContainer.scrollHeight - this.el.panelMessagesContainer.offsetHeight;
                 }
             });
     }
-
+    
 
 
 
@@ -655,12 +672,13 @@ export default class WhatsAppController { // Criando a classe controller do What
             if (file.type === 'application/pdf') {
 
                 FormatBase64.toFile(base64).then(filePreview => {
-                Message.sendDocument(this._contactActive.chatId,
-                    this._user.email,
-                    file,
-                    filePreview,
-                    this.el.infoPanelDocumentPreview
-                )})
+                    Message.sendDocument(this._contactActive.chatId,
+                        this._user.email,
+                        file,
+                        filePreview,
+                        this.el.infoPanelDocumentPreview
+                    )
+                })
             } else {
                 Message.sendDocument(this._contactActive.chatId,
                     this._user.email,
@@ -677,7 +695,7 @@ export default class WhatsAppController { // Criando a classe controller do What
             this.el.modalContacts.show();
 
             this._contactsController = new ContactsController(this._contactsController, this._user);
-            this._contactsController.on('select', contact =>{
+            this._contactsController.on('select', contact => {
                 Message.sendContact(this._contactActive,
                     this._user.email,
                     contact
@@ -691,7 +709,7 @@ export default class WhatsAppController { // Criando a classe controller do What
         this.el.btnCloseModalContacts.on('click', e => {
             this.el.modalContacts.hide();
             this._contactsController.close()
-            
+
         })
 
         // inicia a gravação do audio
