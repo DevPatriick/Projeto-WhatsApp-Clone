@@ -1,7 +1,7 @@
 # **Projeto WhatsApp Clone** 📱📞
 
 Este é o acompanhamento do progresso no curso de **Projeto WhatsApp Clone**. 
-O curso tem um total de **50 aulas**, e atualmente estou na **aula 44**.
+O curso tem um total de **50 aulas**, e atualmente estou na **aula 45**.
 
 ---
 
@@ -9,7 +9,7 @@ O curso tem um total de **50 aulas**, e atualmente estou na **aula 44**.
 
 ### Progresso Atual  
 #### [███████████░░░░░░░░] **88%**  
-- Aulas concluídas: **44 de 50**  
+- Aulas concluídas: **45 de 50**  
 
 ### Bora codar 🚀💻!!
 

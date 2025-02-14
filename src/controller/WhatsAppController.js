@@ -732,6 +732,15 @@ export default class WhatsAppController { // Criando a classe controller do What
 
         // envia o audio
         this.el.btnFinishMicrophone.on('click', e => {
+            this._microphoneController.on('recorded', (file, metadata)=>{
+                Message.sendAudio(
+                    this._contactActive.chatId,
+                    this._user.email,
+                    file,
+                    metadata,
+                    this_user.photo
+                )
+            })
             this._microphoneController.stopRecorder();
             this.closeRecordMicrophone();
         })
