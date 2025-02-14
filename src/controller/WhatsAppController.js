@@ -8,6 +8,7 @@ import { Chat } from '../model/Chat.js';
 import { Message } from '../model/Message.js';
 import { FormatBase64 } from '../utils/Base64.js';
 const Swal = require('sweetalert2')
+import { ContactsController } from './ContactsController.js';
 
 export default class WhatsAppController { // Criando a classe controller do WhatsApp
     constructor() {
@@ -673,12 +674,24 @@ export default class WhatsAppController { // Criando a classe controller do What
 
         // mostra os contatos
         this.el.btnAttachContact.on('click', e => {
-            this.el.modalContacts.show()
+            this.el.modalContacts.show();
+
+            this._contactsController = new ContactsController(this._contactsController, this._user);
+            this._contactsController.on('select', contact =>{
+                Message.sendContact(this._contactActive,
+                    this._user.email,
+                    contact
+                )
+            })
+            this._contactsController.open()
+
         });
 
         // retira o modal dos contatos
         this.el.btnCloseModalContacts.on('click', e => {
-            this.el.modalContacts.hide()
+            this.el.modalContacts.hide();
+            this._contactsController.close()
+            
         })
 
         // inicia a gravação do audio

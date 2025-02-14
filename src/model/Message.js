@@ -71,7 +71,7 @@ export class Message extends Model {
                                                         </div>
                                                         <div class="_1lC8v">
                                                             <div dir="ltr" class="_3gkvk selectable-text invisible-space copyable-text">
-                                                                Nome do Contato Anexado</div>
+                                                                ${this.content.name}</div>
                                                         </div>
                                                         <div class="_3a5-b">
                                                             <div class="_1DZAH" role="button">
@@ -90,6 +90,13 @@ export class Message extends Model {
 
                                             </div>
                                     `
+                                    if (this.content.photo) {
+
+                                        let img = div.querySelector('.photo-contact-sended');
+                                        img.src = this.content.photo;
+                                        img.show();
+                        
+                                    }
                 break;
 
             case 'image':
@@ -402,6 +409,10 @@ export class Message extends Model {
         })
     }
 
+    static sendContact(chaId, from, contact){
+        return Message.send(chaId, from, 'contact', contact)
+    }
+
 
 
     static sendImage(chatId, from, file) {
@@ -420,39 +431,42 @@ export class Message extends Model {
 
     static async send(chatId, from, type, content) {
         console.log("Enviando mensagem para o chat:", chatId);
-        const result_1 = await new Promise((resolve, reject) => {
-            Message.getRef(chatId).add({
+        
+        try {
+            const messageRef = Message.getRef(chatId); 
+            const result = await messageRef.add({
                 content,
                 timeStamp: new Date(),
                 status: 'wait',
                 type,
                 from
-            }).then(result=>{
-
-                let docRef = result.parent.doc(result.id)
-                docRef.set({
-                    status: 'sent'
-                }, {
-                    merge: true
-                }).then(() => {
-                    resolve(docRef);
-                });
             });
-        });
-
-
-        return result_1;
-
-
+    
+            
+            await result.set({ status: 'sent' }, { merge: true });
+    
+            return result;
+        } catch (error) {
+            console.error("Erro ao enviar mensagem:", error);
+            throw error; 
+        }
     }
+    
 
 
-    static getRef(chatId) {
+    static getRef(chatData) {
+        if (typeof chatData === 'object' && chatData.chatId) {
+            chatData = chatData.chatId; 
+        }
+    
+        chatData = String(chatData); 
         return Firebase.db()
             .collection('chats')
-            .doc(chatId)
-            .collection('messages')
+            .doc(chatData)
+            .collection('messages');
     }
+    
+    
 
 
 
