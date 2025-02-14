@@ -33,7 +33,7 @@ export default class Format { // Arquivo util de formatação
     static dateToTime(date, locale = 'pt-BR'){
         return date.toLocaleTimeString(locale, {
             hours: '2-digit',
-            minutes:'2-digit'
+            minute:'2-digit'
         })
     }
 
