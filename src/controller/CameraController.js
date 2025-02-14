@@ -16,6 +16,7 @@ export default class CameraController {
             console.log(stream)
             console.log(videoEl)
             videoEl.srcObject = stream;
+            console.log(videoEl)
             // como stream é um objeto e o videoEl não consegue let um objeto e sim o link 
             // transformo o objeto numa URL
 
@@ -47,7 +48,9 @@ export default class CameraController {
         // esta aparecendo, segundo e terceiro parametro eu digo a partir de onde eu quero desenhar
         // 0 no x e 0 no y.
         context.drawImage(this._videoEl, 0, 0, canvas.width, canvas.height); // a partir do meu contexto vou desenhar a imagem;
-    
+    console.log(context);
+    console.log(canvas);
+
         // agora eu retorno o canvas em base 64
         // com isso eu uso o toDataURL e passo o tipo de imagem que no caso é o mimeType
         return canvas.toDataURL(mimeType);
