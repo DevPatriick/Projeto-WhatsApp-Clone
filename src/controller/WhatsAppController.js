@@ -308,6 +308,16 @@ export default class WhatsAppController { // Criando a classe controller do What
     };
 
     initEvents() { // metodo para inicializar meus eventos
+
+        this.el.inputSearchContacts.on('keyup', e=>{
+            if(this.el.inputSearchContacts.value.length > 0){
+                this.el.inputSearchContactsPlaceholder.hide()
+            } else{
+                this.el.inputSearchContactsPlaceholder.show()
+            }
+
+            this._user.getContacts(this.el.inputSearchContacts.value)
+        })
         this.el.myPhoto.on('click', e => { // detnro dos elementos busco o my-photo que foi convertido para CamelCase myPhoto e passo o on 
             // que é do prototype para adicionar os eventos, quando clicar neste elemento
             // vai fechar todos os paineis que estão dentro do metodo closeAllLeftPanel() 

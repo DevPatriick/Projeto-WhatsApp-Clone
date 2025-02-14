@@ -57,9 +57,9 @@ export default class User extends Model{
        return User.getRef().doc(this.email).collection('contacts').doc(btoa(contact.email)).set(contact.toJSON())
     }
 
-    getContacts(){
+    getContacts(filter = ''){
         return new Promise((resolve, reject)=>{
-            User.getRef().doc(this.email).collection('contacts').onSnapshot(docs=>{
+            User.getRef().doc(this.email).collection('/contacts').where('name', '>=', filter).onSnapshot(docs=>{
                 let contacts = [];
 
                 docs.forEach(doc =>{
