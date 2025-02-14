@@ -6,6 +6,7 @@ import { Firebase } from '../utils/Firebase.js';
 import User from '../model/User.js';
 import { Chat } from '../model/Chat.js';
 import { Message } from '../model/Message.js';
+const Swal = require('sweetalert2')
 
 export default class WhatsAppController { // Criando a classe controller do WhatsApp
     constructor() {
@@ -149,6 +150,10 @@ export default class WhatsAppController { // Criando a classe controller do What
     
     setActiveChat(contact){
 
+        if(this._contactActive){
+            Message.getRef(this._contactActive.chatId).onSnapshot(()=>{})
+        }
+
         console.log(contact);
 
         this._contactActive = contact;
@@ -165,6 +170,27 @@ export default class WhatsAppController { // Criando a classe controller do What
         this.el.home.hide()
         this.el.main.css({
          display: 'flex'
+        })
+
+        Message.getRef(this._contactActive.chatId).orderBy('timeStamp').onSnapshot(docs=>{
+            this.el.panelMessagesContainer.innerHTML = '';
+            docs.forEach(doc=>{
+                let data = doc.data();
+                data.id = doc.id;
+
+                if(!this.el.panelMessagesContainer.querySelector(`#${data.id}`)){
+                    let message = new Message()
+
+                    message.fromJSON(data);
+    
+                    let me = (data.from === this._user.email)
+    
+                    let view = message.getViewElement(me);
+    
+                    this.el.panelMessagesContainer.appendChild(view)
+                }
+                
+            })
         })
     }
 
@@ -332,14 +358,22 @@ export default class WhatsAppController { // Criando a classe controller do What
                         contact.addContact(this._user);
                         this._user.addContact(contact).then(() => {
                             this.el.btnClosePanelAddContact.click()
-                            console.info('Contato adicionado')
+                            Swal.fire({
+                                title: "Contato adicionado",
+                                text: "You clicked the button!",
+                                icon: "success"
+                              });
     
                         })
                     })
 
                     
                 } else {
-                    console.error('Usuário não encontrado')
+                    Swal.fire({
+                        title: "E-mail não encontrado",
+                        icon: "error",
+                        draggable: true
+                      });
                 }
             })
 

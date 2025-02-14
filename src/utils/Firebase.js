@@ -1,5 +1,6 @@
 const firebase = require('firebase')
 require('firebase/firestore')
+// const Swal = require('sweetalert2')
 
 export class Firebase {
     constructor() {
@@ -33,7 +34,6 @@ export class Firebase {
             })
             window._initializedFirebase = true;
         }
-
     }
 
     static db(){
@@ -48,12 +48,15 @@ export class Firebase {
     initAuth(){
         return new Promise( (resolve, reject)=>{
 
+            // Swal.fire("SweetAlert2 is working!");
+
             // autenticação do Google numa variavel para passar o provider
             let provider = new firebase.auth.GoogleAuthProvider();
             // qual conta do google o user que acessar
              firebase.auth().signInWithPopup(provider).then(result =>{
                 let token = result.credential.acessToken;
                 let user = result.user;
+               
 
                 resolve({user, token});
             }).catch(err=>{

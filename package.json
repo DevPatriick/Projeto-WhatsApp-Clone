@@ -21,6 +21,7 @@
   "dependencies": {
     "firebase": "^4.13.1",
     "pdfjs-dist": "^2.0.489",
+    "sweetalert2": "^11.16.0",
     "webpack": "^3.1.0",
     "webpack-dev-server": "^2.5.1"
   },
