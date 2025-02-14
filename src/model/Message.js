@@ -1,6 +1,7 @@
 import { Firebase } from "../utils/Firebase";
 import { Model } from "./Model";
 import Format from './../utils/Format';
+import { Upload } from "../utils/Upload";
 // import { FormatBase64 } from "../utils/Base64";
 
 export class Message extends Model {
@@ -477,18 +478,7 @@ export class Message extends Model {
 
     static upload(file, from) {
 
-        return new Promise((resolve, reject) => {
-
-            let uploadTask = Firebase.hd().ref(from).child(Date.now + '_' + file.name).put(file);
-            uploadTask.on('state_changed', e => {
-                console.info(e)
-            }, err => {
-                reject()
-            }, () => {
-
-                resolve(uploadTask.snapshot)
-            })
-        })
+       return Upload.send(file, from)
     }
 
     static sendContact(chaId, from, contact) {

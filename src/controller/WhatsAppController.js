@@ -9,6 +9,7 @@ import { Message } from '../model/Message.js';
 import { FormatBase64 } from '../utils/Base64.js';
 const Swal = require('sweetalert2')
 import { ContactsController } from './ContactsController.js';
+import { Upload } from '../utils/Upload.js';
 
 export default class WhatsAppController { // Criando a classe controller do WhatsApp
     constructor() {
@@ -386,6 +387,19 @@ export default class WhatsAppController { // Criando a classe controller do What
         // Evento para clicar na foto do perfil e abrir o seletor de arquivos
         this.el.photoContainerEditProfile.on('click', e => { // campo da foto 
             this.el.inputProfilePhoto.click() // incluindo o clique para abrir a seleção de arquivos
+        })
+
+        this.el.inputProfilePhoto.on('change', e=>{
+            if(  this.el.inputProfilePhoto.files.length > 0 ){
+
+                let file = this.el.inputProfilePhoto[0]
+                Upload.send(file, this._user.email).then(snapshot =>{
+                    this._user.photo = snapshot.downloadURL;
+                    history._user.save().then(()=>{
+                        this.el.btnClosePanelEditProfile.click()
+                    })
+                })
+            }
         })
 
         // Evento para salvar a edição do perfil

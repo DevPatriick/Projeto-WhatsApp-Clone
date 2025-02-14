@@ -8,8 +8,8 @@ O curso tem um total de **50 aulas**, e atualmente estou na **aula 45**.
 ## **Status do Curso**
 
 ### Progresso Atual  
-#### [███████████░░░░░░░░] **88%**  
-- Aulas concluídas: **45 de 50**  
+#### [███████████░░░░░░░░] **90%**  
+- Aulas concluídas: **46 de 50**  
 
 ### Bora codar 🚀💻!!
 
